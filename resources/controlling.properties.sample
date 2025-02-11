@@ -1,0 +1,8 @@
+db.host=TODO
+db.port=3306
+db.name=TODO
+db.user=TODO
+db.password=TODO
+
+google.api.clientSecret=credentials.json
+google.tokenDir = tokens
