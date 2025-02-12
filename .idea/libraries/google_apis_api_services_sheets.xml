@@ -29,6 +29,31 @@
       <root url="jar://$PROJECT_DIR$/lib/opencensus-contrib-http-util-0.31.1.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/google-api-services-sheets-v4-rev20240826-2.0.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/google-api-client-2.6.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-codec-1.17.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/google-oauth-client-1.36.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/google-auth-library-credentials-1.23.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/google-auth-library-oauth2-http-1.23.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/auto-value-annotations-1.10.4-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jsr305-3.0.2-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/error_prone_annotations-2.18.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/google-http-client-gson-1.44.2-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/gson-2.10.1-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/guava-33.1.0-jre-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/failureaccess-1.0.2-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/checker-qual-3.42.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/j2objc-annotations-3.0.0-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/google-http-client-apache-v2-1.44.2-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpcore-4.4.16-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/httpclient-4.5.14-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-logging-1.2-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/google-http-client-1.44.2-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grpc-context-1.60.1-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/grpc-api-1.60.1-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/opencensus-api-0.31.1-sources.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/opencensus-contrib-http-util-0.31.1-sources.jar!/" />
+    </SOURCES>
   </library>
 </component>
