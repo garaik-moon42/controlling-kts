@@ -6,3 +6,5 @@ db.password=TODO
 
 google.api.clientSecret=credentials.json
 google.tokenDir = tokens
+
+targetDir = target

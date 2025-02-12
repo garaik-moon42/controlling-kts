@@ -14,7 +14,7 @@ import java.io.InputStreamReader
 
 class GoogleSheetsTools private constructor(private val service: Sheets) {
 
-    fun getSheetContentAsMap(spreadsheetId: String, sheetName: String): List<Map<String?, String>> {
+    fun getSheetContentAsMap(spreadsheetId: String, sheetName: String): List<Map<String, String>> {
         fun columnIndexToA1(index: Int): String {
             return buildString {
                 var i = index
@@ -32,10 +32,15 @@ class GoogleSheetsTools private constructor(private val service: Sheets) {
         val lastColumn = sheet.properties.gridProperties.columnCount ?: 0
         val range = "$sheetName!A1:${columnIndexToA1(lastColumn - 1)}$lastRow"
         val response = service.spreadsheets().values().get(spreadsheetId, range).execute()
-        val content = response.getValues() ?: emptyList()
-        val headerMap = content.first().mapIndexed { i, columnName -> i to columnName.toString() }.toMap()
+        val content = response.getValues()?.filterNotNull() ?: emptyList()
+        val header = content.first()
+        if (header.any { it == null || it.toString().isBlank() }) {
+            error("Sheet header contains null or empty values: $header")
+        }
+        val headerMap = header.mapIndexed { i, columnName -> i to columnName.toString() }.toMap()
+
         return content.drop(1).map { row ->
-            row.mapIndexed { i, value -> headerMap[i] to value.toString() }.toMap()
+            row.filterNotNull().mapIndexed { i, value -> headerMap[i]!! to value.toString() }.toMap()
         }
     }
 
