@@ -1,6 +1,9 @@
 import java.io.File
 import java.io.FileOutputStream
+import java.math.BigDecimal
 import java.nio.charset.Charset
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 const val APPLICATION_NAME = "KH Transfer Export"
 const val SPREADSHEET_ID = "1xuojTv-_jiu6itu7kVxNOSD27lY499d1HNCE9vTyzsw"
@@ -26,17 +29,70 @@ val EXPORT_FILE_HEADER = listOf(
     "Értéknap-max.10"
 ).joinToString(":")
 
+val inputDateFormatter: DateTimeFormatter  = DateTimeFormatter.ofPattern("yyyy.MM.dd.")
+val outputDateFormatter: DateTimeFormatter  = DateTimeFormatter.ofPattern("yyyy.MM.dd")
+val fileNameDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+
+data class Transaction(
+    val targetAccountNumber: String,
+    val beneficiary: String,
+    val amount: BigDecimal,
+    val currency: String,
+    val notice: String,
+    val transferDate: LocalDate,
+) {
+    companion object {
+        fun of(row: Map<String, String>):Transaction {
+            return Transaction(
+                targetAccountNumber = row[COLUMN_TARGET_ACCOUNT_GIRO]?.replace("-", "")?.trim() ?: error("Target account number is missing."),
+                beneficiary = row[COLUMN_BENEFICIARY]?.replace(VALUE_SEPARATOR, " ")?.trim() ?: error("Beneficiary is missing."),
+                amount = row[COLUMN_AMOUNT]?.substringBefore(',')?.replace("\u00A0", "")?.trim()?.toBigDecimal() ?: error("Amount is missing."),
+                currency = row[COLUMN_CURRENCY] ?: error("Currency is missing."),
+                notice = row[COLUMN_NOTICE]?.replace(" ", "")?.trim() ?: error("Notice is missing."),
+                transferDate = LocalDate.parse(row[COLUMN_TRANSFER_DATE] ?: error("Transfer date is missing."), inputDateFormatter)
+            )
+        }
+    }
+}
+
 fun export() {
     File(Config.targetDir).also(File::deleteRecursively).mkdirs() // init and empty target dir
     val gst = GoogleSheetsTools.connectAs(APPLICATION_NAME, Config.Google.apiClientSecret)
     val content = gst.getSheetContentAsMap(SPREADSHEET_ID, SHEET_NAME)
-        .filter { it[COLUMN_STATE] == "Rögzíthető" }.groupBy { it[COLUMN_TRANSFER_DATE] ?: "" }
+        .filter { it[COLUMN_STATE] == "Rögzíthető" && it[COLUMN_CURRENCY] == "HUF" }
+        .map { Transaction.of(it)}
+        .groupBy { it.transferDate }
+        .map { (transferDate, transactions) -> transferDate to groupTransactionsByPartner(transactions) }
+        .toMap()
     content.keys.forEach { transferDate -> createFile(transferDate, content[transferDate]!!) }
 }
 
-private fun createFile(transferDateStr: String, content: List<Map<String, String>>) {
-    val fileNameDate = transferDateStr.replace(".", "")
-    FileOutputStream("${Config.targetDir}${File.separator}kh-utalandok-$fileNameDate.HUF.csv")
+private fun joinWithLengthLimit(s1: String, s2: String, limit: Int = 140): String {
+    val s = "$s1,$s2"
+    return if (s.length <= limit) {
+        s
+    } else {
+        error("Notice length limit exceeded: ${s.length} > $limit when adding notice: `$s2`")
+    }
+}
+
+private fun groupTransactionsByPartner(transactions: List<Transaction>):List<Transaction> {
+    return transactions.groupBy { it.targetAccountNumber }.values.map { partnerTransactions ->
+        partnerTransactions.reduce {
+           t1, t2 -> Transaction(
+               t1.targetAccountNumber,
+               t1.beneficiary,
+               t1.amount + t2.amount,
+               t1.currency,
+               joinWithLengthLimit(t1.notice, t2.notice),
+               t1.transferDate
+           )
+        }
+    }
+}
+
+private fun createFile(transferDate: LocalDate, content: List<Transaction>) {
+    FileOutputStream("${Config.targetDir}${File.separator}kh-utalandok-${fileNameDateFormatter.format(transferDate)}.HUF.csv")
         .bufferedWriter(Charset.forName(TARGET_CHARSET))
         .use { out ->
             out.write(EXPORT_FILE_HEADER)
@@ -48,16 +104,16 @@ private fun createFile(transferDateStr: String, content: List<Map<String, String
         }
 }
 
-private fun generateExportLine(row: Map<String, String>):String {
+private fun generateExportLine(row: Transaction):String {
     return listOf(
         SOURCE_ACCOUNT_GIRO,
-        row[COLUMN_TARGET_ACCOUNT_GIRO]?.replace("-", "")?.trim(),
-        row[COLUMN_BENEFICIARY]?.replace(VALUE_SEPARATOR, " ")?.trim(),
-        row[COLUMN_AMOUNT]?.substringBefore(',')?.replace("\u00A0", "")?.trim(),
-        row[COLUMN_CURRENCY],
-        row[COLUMN_NOTICE] ?: "",
+        row.targetAccountNumber,
+        row.beneficiary,
+        row.amount.toString(),
+        row.currency,
+        row.notice,
         "",
-        row[COLUMN_TRANSFER_DATE]?.substringBeforeLast('.')
+        outputDateFormatter.format(row.transferDate),
     ).joinToString(VALUE_SEPARATOR)
 }
 
