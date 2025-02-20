@@ -3,7 +3,7 @@ import java.sql.*
 import java.time.LocalDate
 import java.util.HashSet
 
-const val DATABASE_TABLE_NAME = "BANK_TRANSACTIONS_TMP"
+const val DATABASE_TABLE_NAME = "BANK_TRANSACTIONS"
 
 object DatabaseConnector: AutoCloseable {
     private val connection: Connection by lazy {
@@ -92,7 +92,7 @@ object DatabaseConnector: AutoCloseable {
     }
 
     fun update(tli: TransactionLogItem) {
-        fun executeUpdateIfNotNull(statement: PreparedStatement, value: Any?): Boolean {
+        fun executeUpdateIfNotNull(statement: PreparedStatement, value: Any?): Int {
             if (value != null) {
                 when (value) {
                     is String -> statement.setString(1, value)
@@ -102,24 +102,26 @@ object DatabaseConnector: AutoCloseable {
                     else -> error("Unsupported value type: ${value::class.java.name}")
                 }
                 statement.setInt(2, tli.id)
-                statement.executeUpdate()
-                return true
+                return statement.executeUpdate()
             }
-            return false
+            return 0
         }
 
         with (connection) {
             try {
                 autoCommit = false
-                if (listOf(
-                        executeUpdateIfNotNull(updateCategoryStatement, tli.ctrlCategory),
-                        executeUpdateIfNotNull(updateMonthStatement, tli.ctrlMonth),
-                        executeUpdateIfNotNull(updateIncludeStatement, tli.ctrlInclude),
-                        executeUpdateIfNotNull(updateVatStatement, tli.ctrlVat),
-                        executeUpdateIfNotNull(updateAmountStatement, tli.ctrlAmount),
-                        executeUpdateIfNotNull(updateInvoiceUrlStatement, tli.ctrlInvoiceUrl)
-                    ).any { it }
-                ) {
+                val updateResults = listOf(
+                    executeUpdateIfNotNull(updateCategoryStatement, tli.ctrlCategory),
+                    executeUpdateIfNotNull(updateMonthStatement, tli.ctrlMonth),
+                    executeUpdateIfNotNull(updateIncludeStatement, tli.ctrlInclude),
+                    executeUpdateIfNotNull(updateVatStatement, tli.ctrlVat),
+                    executeUpdateIfNotNull(updateAmountStatement, tli.ctrlAmount),
+                    executeUpdateIfNotNull(updateInvoiceUrlStatement, tli.ctrlInvoiceUrl)
+                )
+                if (updateResults.any { it > 1 }) {
+                    error("Unexpected update result count: $updateResults for $tli")
+                }
+                if (updateResults.any { it == 1 }) {
                     commit()
                     updateCount++
                     println("Updated $tli")
