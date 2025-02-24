@@ -56,8 +56,8 @@ data class Transaction(
 }
 
 fun export() {
-    File(Config.targetDir).also(File::deleteRecursively).mkdirs() // init and empty target dir
-    val gst = GoogleSheetsTools.connectAs(APPLICATION_NAME, Config.Google.apiClientSecret)
+    File(Config.data.targetDir).also(File::deleteRecursively).mkdirs() // init and empty target dir
+    val gst = GoogleSheetsTools.connectAs(APPLICATION_NAME, Config.data.google.clientSecret)
     val content = gst.getSheetContentAsMap(SPREADSHEET_ID, SHEET_NAME)
         .filter { it[COLUMN_STATE] == "Rögzíthető" && it[COLUMN_CURRENCY] == "HUF" }
         .map { Transaction.of(it)}
@@ -92,7 +92,7 @@ private fun groupTransactionsByPartner(transactions: List<Transaction>):List<Tra
 }
 
 private fun createFile(transferDate: LocalDate, content: List<Transaction>) {
-    FileOutputStream("${Config.targetDir}${File.separator}kh-utalandok-${fileNameDateFormatter.format(transferDate)}.HUF.csv")
+    FileOutputStream("${Config.data.targetDir}${File.separator}kh-utalandok-${fileNameDateFormatter.format(transferDate)}.HUF.csv")
         .bufferedWriter(Charset.forName(TARGET_CHARSET))
         .use { out ->
             out.write(EXPORT_FILE_HEADER)

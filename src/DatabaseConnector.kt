@@ -7,8 +7,8 @@ const val DATABASE_TABLE_NAME = "BANK_TRANSACTIONS"
 
 object DatabaseConnector: AutoCloseable {
     private val connection: Connection by lazy {
-        val jdbcUrl = "jdbc:mysql://${Config.DB.host}:${Config.DB.port}/${Config.DB.name}?useSSL=false&allowPublicKeyRetrieval=true"
-        DriverManager.getConnection(jdbcUrl, Config.DB.user, Config.DB.password)
+        val jdbcUrl = "jdbc:mysql://${Config.data.db.host}:${Config.data.db.port}/${Config.data.db.name}?useSSL=false&allowPublicKeyRetrieval=true"
+        DriverManager.getConnection(jdbcUrl, Config.data.db.user, Config.data.db.password)
     }
 
     private fun prepareUpdateStatement(fieldName: String) = connection.prepareStatement("update $DATABASE_TABLE_NAME set $fieldName = ? where id = ?")

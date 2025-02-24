@@ -59,7 +59,7 @@ class GoogleSheetsTools private constructor(private val service: Sheets) {
             val clientSecret = GoogleClientSecrets.load(GsonFactory.getDefaultInstance(), InputStreamReader(csStream))
             val flow = GoogleAuthorizationCodeFlow.Builder(
                 httpTransport, GsonFactory.getDefaultInstance(), clientSecret, listOf(SheetsScopes.SPREADSHEETS_READONLY))
-                .setDataStoreFactory(FileDataStoreFactory(File(Config.Google.tokenDir)))
+                .setDataStoreFactory(FileDataStoreFactory(File(Config.data.google.tokenDir)))
                 .setAccessType("offline")
                 .build()
             return AuthorizationCodeInstalledApp(flow, LocalServerReceiver()).authorize("user")

@@ -1,6 +1,9 @@
 fun main() {
-    val gst = GoogleSheetsTools.connectAs("Transaction Log Updater", Config.Google.apiClientSecret)
-    val content: List<Map<String, String>> = gst.getSheetContentAsMap("1OW-XxFt984tqmEqx6AJtH5Lqh-NVWyg-WDHb5TGSbi0", "TRANSACTIONS")
-    content.map(TransactionLogItem::of).forEach(DatabaseConnector::update)
+    val gst = GoogleSheetsTools.connectAs("Transaction Log Updater", Config.data.google.clientSecret)
+    Config.data.importSheets.filter { it.active }.forEach { importSheetConfig ->
+        println("Processing [${importSheetConfig.remark}]...")
+        val content: List<Map<String, String>> = gst.getSheetContentAsMap(importSheetConfig.id, importSheetConfig.sheetName)
+        content.map(TransactionLogItem::of).forEach(DatabaseConnector::update)
+    }
     println("${DatabaseConnector.updateCount} transaction log item updated.")
 }

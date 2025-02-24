@@ -1,0 +1,28 @@
+{
+  "db": {
+    "host": "<DB HOST>",
+    "port": 3306,
+    "name": "<DB NAME>",
+    "user": "<DB USER>",
+    "password": "<DB PASSWORD>"
+  },
+  "google": {
+    "clientSecret": "credentials.json",
+    "tokenDir": "tokens"
+  },
+  "importSheets": [
+    {
+      "remark": "Transactions of 2024",
+      "active": false,
+      "id": "1TwFbZsPHUD3rsrfxQKdlzwbBJzgtnoGqOenFsWXK9mM",
+      "sheetName": "TRANSACTIONS"
+    },
+    {
+      "remark": "Transactions of 2025",
+      "active": true,
+      "id": "1OW-XxFt984tqmEqx6AJtH5Lqh-NVWyg-WDHb5TGSbi0",
+      "sheetName": "TRANSACTIONS"
+    }
+  ],
+  "targetDir": "target"
+}

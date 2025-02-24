@@ -1,28 +1,41 @@
-import java.util.*
+import com.google.gson.Gson
+import java.io.InputStreamReader
 
 object Config {
-    private val properties: Properties
+    val data: ConfigData
+
     init {
-        val propertiesFileName = "controlling.properties"
-        val propertiesFileUrl = this::class.java.classLoader.getResource(propertiesFileName)
-            ?: error("Properties file not found: $propertiesFileName.")
-        properties = Properties().apply { load(propertiesFileUrl.openStream()) }
+        val configFileName = "controlling-config.json"
+        val configFileUrl = this::class.java.classLoader.getResource(configFileName)
+            ?: error("Config file not found: $configFileName")
+        data = InputStreamReader(configFileUrl.openStream()).use {
+            Gson().fromJson(it, ConfigData::class.java)
+        }
     }
-
-    val targetDir: String = properties.getProperty("targetDir")
-
-    object DB {
-        val host: String = properties.getProperty("db.host")
-        val port: String = properties.getProperty("db.port")
-        val name: String = properties.getProperty("db.name")
-        val user: String = properties.getProperty("db.user")
-        val password: String = properties.getProperty("db.password")
-    }
-
-    object Google {
-        val apiClientSecret: String = properties.getProperty("google.api.clientSecret")
-        val tokenDir: String = properties.getProperty("google.tokenDir")
-    }
-
 }
+data class ImportSheetConfig(
+    val remark: String,
+    val active: Boolean,
+    val id: String,
+    val sheetName: String
+)
 
+data class ConfigData(
+    val db: DBConfig,
+    val google: GoogleConfig,
+    val importSheets: List<ImportSheetConfig>,
+    val targetDir: String
+)
+
+data class DBConfig(
+    val host: String,
+    val port: Int,
+    val name: String,
+    val user: String,
+    val password: String
+)
+
+data class GoogleConfig(
+    val clientSecret: String,
+    val tokenDir: String
+)
