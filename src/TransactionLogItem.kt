@@ -8,7 +8,7 @@ import java.time.temporal.ChronoField
 import java.util.*
 
 
-data class TransactionLogItem(
+data class TransactionLogItem (
     val id:Int,
     val accountNumber: String,
     val accountName: String,

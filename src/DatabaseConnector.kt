@@ -31,7 +31,7 @@ object DatabaseConnector: AutoCloseable {
     var skipCount = 0
     var updateCount = 0
 
-    val storedItemIds: MutableSet<Int> by lazy {
+    private val storedItemIds: MutableSet<Int> by lazy {
         HashSet<Int>().apply {
             connection.createStatement().executeQuery("select id from $DATABASE_TABLE_NAME;").use { rs ->
                 while (rs.next()) {
@@ -56,6 +56,11 @@ object DatabaseConnector: AutoCloseable {
         if (storedItemIds.contains(tli.id)) {
             skipCount++
         } else {
+            fun booleanToInt(b: Boolean?) = when (b) {
+                null -> -1
+                false -> 0
+                true -> 1
+            }
             println("Inserting $tli...")
             insertStatement.setInt(1, tli.id)
             insertStatement.setString(2, tli.accountNumber)
@@ -69,16 +74,8 @@ object DatabaseConnector: AutoCloseable {
             insertStatement.setString(10, tli.currency)
             insertStatement.setString(11, tli.ctrlCategory)
             insertStatement.setDate(12, tli.ctrlMonth?.let(Date::valueOf))
-            insertStatement.setInt(13, when (tli.ctrlInclude) {
-                null -> -1
-                false -> 0
-                true -> 1
-            })
-            insertStatement.setInt(14, when (tli.ctrlVat) {
-                null -> -1
-                false -> 0
-                true -> 1
-            })
+            insertStatement.setInt(13, booleanToInt(tli.ctrlInclude))
+            insertStatement.setInt(14, booleanToInt(tli.ctrlVat))
             insertStatement.setBigDecimal(15, tli.ctrlAmount)
             insertStatement.setString(16, tli.notice)
             insertStatement.setString(17, tli.transactionBankId)

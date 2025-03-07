@@ -27,7 +27,7 @@ class GoogleSheetsTools private constructor(private val service: Sheets) {
 
         val spreadsheet = service.spreadsheets().get(spreadsheetId).execute()
         val sheet = spreadsheet.sheets.firstOrNull { it.properties.title == sheetName }
-            ?: error("Sheet $SHEET_NAME not found.")
+            ?: error("Sheet $sheetName not found.")
         val lastRow = sheet.properties.gridProperties.rowCount ?: 0
         val lastColumn = sheet.properties.gridProperties.columnCount ?: 0
         val range = "$sheetName!A1:${columnIndexToA1(lastColumn - 1)}$lastRow"
@@ -46,7 +46,8 @@ class GoogleSheetsTools private constructor(private val service: Sheets) {
 
     companion object {
 
-        fun connectAs(applicationName: String, credentialsFilePath: String):GoogleSheetsTools {
+        fun connectAs(applicationName: String):GoogleSheetsTools {
+            val credentialsFilePath = Config.data.google.clientSecret
             val httpTransport = GoogleNetHttpTransport.newTrustedTransport()
             val service = Sheets.Builder(httpTransport, GsonFactory.getDefaultInstance(), getCredentials(httpTransport, credentialsFilePath))
                 .setApplicationName(applicationName)

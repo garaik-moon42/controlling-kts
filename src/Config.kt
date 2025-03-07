@@ -13,21 +13,24 @@ object Config {
         }
     }
 }
-data class ImportSheetConfig(
+
+data class ImportSheetConfig (
     val remark: String,
     val active: Boolean,
     val id: String,
     val sheetName: String
 )
 
-data class ConfigData(
+data class ConfigData (
+    val applicationName: String,
     val db: DBConfig,
     val google: GoogleConfig,
-    val importSheets: List<ImportSheetConfig>,
-    val targetDir: String
+    val csvImport: CsvImportConfig,
+    val transferExport: TransferExportConfig,
+    val transactionUpdater: TransactionUpdaterConfig
 )
 
-data class DBConfig(
+data class DBConfig (
     val host: String,
     val port: Int,
     val name: String,
@@ -35,7 +38,25 @@ data class DBConfig(
     val password: String
 )
 
-data class GoogleConfig(
+data class GoogleConfig (
     val clientSecret: String,
     val tokenDir: String
+)
+
+data class CsvImportConfig (
+    val dir: String,
+    val charset: String
+)
+
+data class TransferExportConfig (
+    val sourceSpreadsheetId: String,
+    val sourceSheetName: String,
+    val sourceAccountGiro: String,
+    val valueSeparator: String,
+    val charset: String,
+    val targetDir: String
+)
+
+data class TransactionUpdaterConfig (
+    val importSheets: List<ImportSheetConfig>
 )

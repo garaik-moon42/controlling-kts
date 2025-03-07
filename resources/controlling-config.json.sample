@@ -1,4 +1,5 @@
 {
+  "applicationName": "MOON42 Controlling Toolbox",
   "db": {
     "host": "<DB HOST>",
     "port": 3306,
@@ -10,19 +11,32 @@
     "clientSecret": "credentials.json",
     "tokenDir": "tokens"
   },
-  "importSheets": [
-    {
-      "remark": "Transactions of 2024",
-      "active": false,
-      "id": "1TwFbZsPHUD3rsrfxQKdlzwbBJzgtnoGqOenFsWXK9mM",
-      "sheetName": "TRANSACTIONS"
-    },
-    {
-      "remark": "Transactions of 2025",
-      "active": true,
-      "id": "1OW-XxFt984tqmEqx6AJtH5Lqh-NVWyg-WDHb5TGSbi0",
-      "sheetName": "TRANSACTIONS"
-    }
-  ],
-  "targetDir": "target"
+  "csvImport": {
+    "dir": "input",
+    "charset": "ISO-8859-2"
+  },
+  "transferExport": {
+    "sourceSpreadsheetId": "1xuojTv-_jiu6itu7kVxNOSD27lY499d1HNCE9vTyzsw",
+    "sourceSheetName": "SZÁMLÁK",
+    "sourceAccountGiro": "104010005052678450831006",
+    "valueSeparator": ";",
+    "charset": "ISO-8859-2",
+    "targetDir": "target"
+  },
+  "transactionUpdater": {
+    "importSheets": [
+      {
+        "remark": "Transactions of 2024",
+        "active": false,
+        "id": "1TwFbZsPHUD3rsrfxQKdlzwbBJzgtnoGqOenFsWXK9mM",
+        "sheetName": "TRANSACTIONS"
+      },
+      {
+        "remark": "Transactions of 2025",
+        "active": true,
+        "id": "1OW-XxFt984tqmEqx6AJtH5Lqh-NVWyg-WDHb5TGSbi0",
+        "sheetName": "TRANSACTIONS"
+      }
+    ]
+  }
 }
