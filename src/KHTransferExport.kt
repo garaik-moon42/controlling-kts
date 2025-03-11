@@ -54,7 +54,7 @@ data class Transaction(
 
 fun export() {
     File(myConfig.targetDir).also(File::deleteRecursively).mkdirs() // init and empty target dir
-    val gst = GoogleSheetsTools.connectAs(myConfig.applicationName)
+    val gst = GoogleSheetsTools.connectAs(Config.data.applicationName)
     val content = gst.getSheetContentAsMap(myConfig.sourceSpreadsheetId, myConfig.sourceSheetName)
         .filter { it[COLUMN_STATE] == "Rögzíthető" && it[COLUMN_CURRENCY] == "HUF" }
         .map { Transaction.of(it)}
