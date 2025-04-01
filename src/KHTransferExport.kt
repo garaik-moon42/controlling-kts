@@ -45,8 +45,8 @@ data class Transaction(
                 beneficiary = row[COLUMN_BENEFICIARY]?.replace(myConfig.valueSeparator, " ")?.trim() ?: error("Beneficiary is missing."),
                 amount = row[COLUMN_AMOUNT]?.substringBefore(',')?.replace("\u00A0", "")?.trim()?.toBigDecimal() ?: error("Amount is missing."),
                 currency = row[COLUMN_CURRENCY] ?: error("Currency is missing."),
-                notice = row[COLUMN_NOTICE]?.replace(" ", "")?.trim() ?: error("Notice is missing."),
-                transferDate = LocalDate.parse(row[COLUMN_TRANSFER_DATE] ?: error("Transfer date is missing."), inputDateFormatter)
+                notice = row[COLUMN_NOTICE]?.replace(" ", "")?.trim()?.ifBlank { null } ?: error("Notice is missing."),
+                transferDate = row[COLUMN_TRANSFER_DATE]?.ifBlank { null }?.let { LocalDate.parse(it, inputDateFormatter) } ?: error("Transfer date is missing.")
             )
         }
     }
