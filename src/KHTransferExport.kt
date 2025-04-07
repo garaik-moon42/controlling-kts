@@ -89,7 +89,8 @@ private fun groupTransactionsByPartner(transactions: List<Transaction>):List<Tra
 }
 
 private fun createFile(transferDate: LocalDate, content: List<Transaction>) {
-    FileOutputStream("${myConfig.targetDir}${File.separator}kh-utalandok-${fileNameDateFormatter.format(transferDate)}.HUF.csv")
+    val fileName = "${myConfig.targetDir}${File.separator}kh-utalandok-${fileNameDateFormatter.format(transferDate)}.HUF.csv"
+    FileOutputStream(fileName)
         .bufferedWriter(Charset.forName(myConfig.charset))
         .use { out ->
             out.write(EXPORT_FILE_HEADER)
@@ -98,6 +99,8 @@ private fun createFile(transferDate: LocalDate, content: List<Transaction>) {
                 out.write(generateExportLine(row))
                 out.newLine()
             }
+            val formattedSum = content.sumOf { it.amount }.let { "%,.2f".format(it).replace(',', ' ').replace('.', ',') }
+            println("File `$fileName` is created with the total amount of $formattedSum")
         }
 }
 
