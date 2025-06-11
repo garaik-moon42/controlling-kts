@@ -12,6 +12,7 @@ private fun importFile(filePath: Path) {
         lines
             .filter { line -> line != header }
             .map(TransactionLogItem::of)
+            .map(TransactionLogItem::detectCtrlCategory) // I am not really sure that the detection mechanism is good at this place
             .forEach(DatabaseConnector::insert)
     }
 }
