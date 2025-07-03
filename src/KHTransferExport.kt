@@ -89,19 +89,31 @@ private fun groupTransactionsByPartner(transactions: List<Transaction>):List<Tra
 }
 
 private fun createFile(transferDate: LocalDate, content: List<Transaction>) {
-    val fileName = "${myConfig.targetDir}${File.separator}kh-utalandok-${fileNameDateFormatter.format(transferDate)}.HUF.csv"
-    FileOutputStream(fileName)
-        .bufferedWriter(Charset.forName(myConfig.charset))
-        .use { out ->
-            out.write(EXPORT_FILE_HEADER)
-            out.newLine()
-            content.forEach { row ->
-                out.write(generateExportLine(row))
+    val chunked = content.chunked(40)
+    var sum = BigDecimal.ZERO
+    chunked.forEachIndexed { index, chunk ->
+        val fileName = """
+            ${myConfig.targetDir}${File.separator}kh-utalandok-${fileNameDateFormatter.format(transferDate)}${if (index > 0) "-" + (index + 1) else ""}.HUF.csv
+            """.trimIndent()
+        FileOutputStream(fileName)
+            .bufferedWriter(Charset.forName(myConfig.charset))
+            .use { out ->
+                out.write(EXPORT_FILE_HEADER)
                 out.newLine()
+                chunk.forEach { row ->
+                    out.write(generateExportLine(row))
+                    out.newLine()
+                }
+                val chunkSum = chunk.sumOf { it.amount }
+                sum += chunkSum
+                println("File `$fileName` is created with the total amount of ${getFormattedSum(chunkSum)}")
             }
-            val formattedSum = content.sumOf { it.amount }.let { "%,.2f".format(it).replace(',', ' ').replace('.', ',') }
-            println("File `$fileName` is created with the total amount of $formattedSum")
-        }
+    }
+    println("Total exported amount: ${getFormattedSum(sum)}")
+}
+
+private fun getFormattedSum(chunkSum: BigDecimal):String {
+    return "%,.2f".format(chunkSum).replace(',', ' ').replace('.', ',')
 }
 
 private fun generateExportLine(row: Transaction):String {
