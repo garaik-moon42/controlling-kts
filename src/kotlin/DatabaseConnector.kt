@@ -82,7 +82,12 @@ object DatabaseConnector: AutoCloseable {
             insertStatement.setString(18, tli.transactionTypeCode)
             insertStatement.setString(19, tli.transactionTypeName)
             insertStatement.setString(20, tli.ctrlInvoiceUrl)
-            insertStatement.executeUpdate()
+            try {
+                insertStatement.executeUpdate()
+            } catch (e: Exception) {
+                System.err.println("Error inserting transaction log item:\nTLI:\n$tli:\nMESSAGE: ${e.message}")
+                throw e;
+            }
             storedItemIds.add(tli.id)
             insertCount++
         }

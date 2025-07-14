@@ -18,6 +18,6 @@ private fun importFile(filePath: Path) {
 }
 
 fun main() {
-    Path.of(Config.data.csvImport.dir).listDirectoryEntries("*.csv").forEach(::importFile)
+    Path.of(Config.data.csvImport.dir).listDirectoryEntries("HISTORY_2025.csv").forEach(::importFile)
     println("${DatabaseConnector.insertCount} items inserted, ${DatabaseConnector.skipCount} items skipped.")
 }

@@ -125,36 +125,39 @@ data class TransactionLogItem (
 
         // ToDo: consider moving this method to a better place
         fun detectCtrlCategory(tli: TransactionLogItem): TransactionLogItem {
+            fun Set<String>.containsIgnoreCase(value: String): Boolean {
+                return this.any { it.contains(value, ignoreCase = true) }
+            }
             val onlineServicePartners = setOf(
                 "Adobe Systems Software", "OPENAI  CHATGPT SUBSCR", "ATLASSIAN", "GOOGLE GSUITE MOON42.C",
                 "AWS EMEA", "REMARKABLE", "2CO.COM!HP INC.", "ZAPIER.COM/CHARGE", "SLACK T0225UG4P9C",
                 "SLACK TQK3B5K8A", "DEEPL  SUB 2654037 CUS")
             val bankCostPartners = setOf("Kp.felvét tranzakciós jutalék", "Könyvelési díj - deviza",
                 "Könyvelési díj - hitel", "Kamat", "Könyvelési díj", "Rendelkezésre tartási jutalék",
-                "Hitelkamat törlesztés")
+                "Hitelkamat törlesztés", "Forint átutalás díj elektronikus bankon kívül",
+                "Deviza átutalás díj elektronikus", "Azonnali Forint átutalás díj bankon kívül")
             val subcontractorPartners = setOf("Proszenyák Norbert ev.", "Tóth Bence Dániel", "Hawat Consulting Bt.",
                 "Identity Hungary Kft.", "Build Kft. Tóth Bence", "Robár Róbert")
+            val interTransferTransactionTypeNames = setOf("Kártyafedezeti rendelkezés alapján",
+                "azonnali ft átvezetés", "murex interfész könyvelései", "Kartyaszamla feltoltese")
+            val bankCostTransactionTypeNames = setOf("Bankkártyával kapcsolatos jutalék",
+                "jutalék, díj", "átutalás jutalék - elektronikus")
             return when {
-                tli.notice.contains("Kártyafedezeti rendelkezés alapján", ignoreCase = true)
-                        || tli.transactionTypeName.contains("azonnali ft átvezetés", ignoreCase = true)
-                        || tli.transactionTypeName.contains("murex interfész könyvelései", ignoreCase = true)
+                interTransferTransactionTypeNames.containsIgnoreCase(tli.transactionTypeName)
                         -> tli.copy(ctrlCategory = "átvezetés", ctrlInclude = false, ctrlVat = false)
                 tli.transactionTypeName.contains("készpénz felvétel - atm", ignoreCase = true)
                         -> tli.copy(ctrlCategory = "készpénz", ctrlInclude = false, ctrlVat = false)
-                tli.transactionTypeName.contains("Bankkártyával kapcsolatos jutalék", ignoreCase = true)
-                        || tli.transactionTypeName.contains("jutalék, díj", ignoreCase = true)
-                        || tli.transactionTypeName.contains("átutalás jutalék - elektronikus", ignoreCase = true)
+                bankCostTransactionTypeNames.containsIgnoreCase(tli.transactionTypeName)
                         || bankCostPartners.contains(tli.partner)
                         -> tli.copy(ctrlCategory = "bankköltség", ctrlInclude = true, ctrlVat = false)
-                onlineServicePartners.contains(tli.partner)
+                onlineServicePartners.containsIgnoreCase(tli.partner)
                         -> tli.copy(ctrlCategory = "online szolgáltatás")
                 tli.partner.contains("cleverant", ignoreCase = true)
                         -> tli.copy(ctrlCategory = "cleverant")
-                subcontractorPartners.contains(tli.partner)
+                subcontractorPartners.containsIgnoreCase(tli.partner)
                         -> tli.copy(ctrlCategory = "alvállalkozó", ctrlInclude = true, ctrlVat = true)
                 else -> tli
             }
-            
         }
     }
 }
