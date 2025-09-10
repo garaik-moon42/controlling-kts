@@ -142,10 +142,11 @@ data class TransactionLogItem (
                 "azonnali ft átvezetés", "murex interfész könyvelései", "Kartyaszamla feltoltese")
             val bankCostTransactionTypeNames = setOf("Bankkártyával kapcsolatos jutalék",
                 "jutalék, díj", "átutalás jutalék - elektronikus")
+            val cashWithdrawTransactionTypeNames = setOf("Készpénz felvétel - ATM", "Keszpenzfelvet K&H ATM-bol")
             return when {
                 interTransferTransactionTypeNames.containsIgnoreCase(tli.transactionTypeName)
                         -> tli.copy(ctrlCategory = "átvezetés", ctrlInclude = false, ctrlVat = false)
-                tli.transactionTypeName.contains("készpénz felvétel - atm", ignoreCase = true)
+                cashWithdrawTransactionTypeNames.containsIgnoreCase(tli.transactionTypeName)
                         -> tli.copy(ctrlCategory = "készpénz", ctrlInclude = false, ctrlVat = false)
                 bankCostTransactionTypeNames.containsIgnoreCase(tli.transactionTypeName)
                         || bankCostPartners.contains(tli.partner)
