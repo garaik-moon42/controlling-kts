@@ -6,7 +6,9 @@ CREATE TABLE BANK_TRANSACTIONS
     ENTRY_DATE             DATETIME       NOT NULL, -- Note: ZonedDateTime's zone details will be lost.
     VALUE_DATE             DATE           NOT NULL,
     MONTH                  DATE           NOT NULL,
-    COUNTER_ACCOUNT_NUMBER VARCHAR(34),             -- 34 characters are the upper limit of IBAN bank account numbers.
+    COUNTER_ACCOUNT_NUMBER VARCHAR(48),             -- 34 characters are the upper limit of IBAN bank account numbers.
+                                                    -- Although we are receiving the IBAN numbers with spaces,
+                                                    -- so we preserve more space.
     PARTNER                VARCHAR(100),
     AMOUNT                 DECIMAL(20, 2) NOT NULL, -- You can adjust precision (20) and scale (2) as needed.
     CURRENCY               VARCHAR(3)     NOT NULL,
